@@ -1,6 +1,7 @@
 import pytest
-from word_search_generator.parser import parse_input, Topic
+
 from word_search_generator.generator import generate, occurrences
+from word_search_generator.parser import parse_input
 
 
 def test_multiple_topics():
