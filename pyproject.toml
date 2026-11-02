@@ -1,0 +1,19 @@
+[project]
+name = "word-search-generator"
+version = "0.1.0"
+description = "Deterministic word search puzzle generator for Koko Puzzles"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+word-search = "word_search_generator.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.9"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
