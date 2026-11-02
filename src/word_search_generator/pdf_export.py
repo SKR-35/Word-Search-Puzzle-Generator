@@ -9,9 +9,12 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 PAGE_W, PAGE_H = letter
-INK = HexColor("#222A32")
-ACCENT = HexColor("#9A6439")
-LIGHT = HexColor("#E8D8C8")
+
+# Print-friendly color palette
+PRIMARY = HexColor("#35617D")
+SECONDARY = HexColor("#A9C5D3")
+TEXT = HexColor("#253746")
+LIGHT = HexColor("#E8EFF3")
 
 
 def _fit_title(
@@ -22,7 +25,7 @@ def _fit_title(
     if c.stringWidth(title, "Helvetica-Bold", size) > max_width:
         raise ValueError("Topic title is too long for the page")
     c.setFont("Helvetica-Bold", size)
-    c.setFillColor(INK)
+    c.setFillColor(TEXT)
     c.drawCentredString(x, y, title)
 
 
@@ -46,7 +49,7 @@ def _grid(
     if answer:
         # Draw translucent highlights UNDER the letters; print-safe in grayscale too.
         c.saveState()
-        c.setStrokeColor(ACCENT)
+        c.setStrokeColor(PRIMARY)
         c.setLineCap(1)
         c.setLineWidth(step * 0.76)
         if hasattr(c, "setStrokeAlpha"):
@@ -58,7 +61,7 @@ def _grid(
             y1 = top - (p.row + (len(p.word) - 1) * p.dr + 0.5) * step
             c.line(x0, y0, x1, y1)
         c.restoreState()
-    c.setFillColor(INK)
+    c.setFillColor(TEXT)
     font_size = min(step * 0.64, 15 if not answer else 8)
     c.setFont("Courier-Bold" if not answer else "Courier", font_size)
     for r, line in enumerate(puzzle.grid):
@@ -84,12 +87,12 @@ def export_pdfs(
     c = canvas.Canvas(str(puzzles_path), pagesize=letter, pageCompression=1)
     c.setTitle("Word Search")
     for number, (_db_id, puzzle, topic) in enumerate(items, start=1):
-        c.setFillColor(ACCENT)
+        c.setFillColor(PRIMARY)
         c.setFont("Helvetica-Bold", 10)
         c.drawCentredString(PAGE_W / 2, 748, "WORD SEARCH")
         _fit_title(c, topic.name, PAGE_W / 2, 715, 510, 20)
         c.setFont("Helvetica", 9.5)
-        c.setFillColor(INK)
+        c.setFillColor(TEXT)
         c.drawCentredString(
             PAGE_W / 2,
             690,
@@ -99,7 +102,7 @@ def export_pdfs(
         c.drawCentredString(
             PAGE_W / 2,
             670,
-            "Search horizontally, vertically, or diagonally; forwards or backwards.",
+            "Search horizontally, vertically or diagonally; forwards or backwards.",
         )
         c.drawCentredString(PAGE_W / 2, 656, "Words may intersect with one another.")
         grid_width = 468
@@ -116,10 +119,10 @@ def export_pdfs(
             if c.stringWidth(label, "Helvetica", font_size) > 142:
                 raise ValueError(f"Word too wide for printed list: {word}")
             c.setFont("Helvetica", font_size)
-            c.setFillColor(INK)
+            c.setFillColor(TEXT)
             c.drawString(78 + col * 156, 128 - row * 17, label)
         c.setFont("Helvetica", 8)
-        c.setFillColor(ACCENT)
+        c.setFillColor(PRIMARY)
         c.drawCentredString(PAGE_W / 2, 35, f"PUZZLES   |   {number}")
         c.showPage()
     c.save()
@@ -127,14 +130,14 @@ def export_pdfs(
     s = canvas.Canvas(str(solutions_path), pagesize=letter, pageCompression=1)
     s.setTitle("Word Search Solutions")
     for base in range(0, len(items), 4):
-        s.setFillColor(ACCENT)
+        s.setFillColor(PRIMARY)
         s.setFont("Helvetica-Bold", 14)
         s.drawCentredString(PAGE_W / 2, 756, "SOLUTIONS")
         for local, (_db_id, puzzle, topic) in enumerate(items[base : base + 4]):
             col, row = local % 2, local // 2
             center_x = 164 if col == 0 else 448
             top = 714 if row == 0 else 358
-            s.setFillColor(INK)
+            s.setFillColor(TEXT)
             s.setFont("Helvetica-Bold", 10)
             s.drawCentredString(center_x, top, f"PUZZLE {base + local + 1:03d}")
             _fit_title(s, topic.name, center_x, top - 16, 258, 9)
