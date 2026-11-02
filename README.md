@@ -25,3 +25,14 @@ uv run word-search examples/input.txt --size 20 --seed 42 --min-quality 80 --can
 ```
 
 The CLI searches deterministic candidate boards and reports a 0–100 placement-quality score, component metrics and an informational difficulty rating. If no candidate meets the threshold, it exits with an error rather than outputting an inferior board. This is still a preview: **SQLite persistence and PDF export are not implemented**. The score is a heuristic and its weights/threshold need calibration on actual print samples.
+
+## Phase 3 — SQLite persistence
+
+```powershell
+uv run word-search examples/input.txt --size 20 --seed 42 --min-quality 80 --candidates 100 --db data/puzzles.db
+uv run pytest -q
+uv run ruff check .
+uv run ruff format --check .
+```
+
+`--db` enables saving; omitting it keeps preview-only behavior. Each topic is generated and validated before a single atomic database save. The database stores the original input word order, the grid, solution coordinates, instructions, scores and metric version. Repeating the same generation returns existing IDs instead of adding duplicates. PDF export is planned for Phase 4.

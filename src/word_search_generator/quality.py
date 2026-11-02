@@ -75,11 +75,11 @@ def evaluate(puzzle: Puzzle) -> QualityReport:
         0.0, 100 * (1 - 2 * math.hypot(mean_r - 0.5, mean_c - 0.5) / math.sqrt(0.5))
     )
     components = {
-    "spatial_entropy": entropy,
-    "direction_diversity": direction_score,
-    "spatial_coverage": coverage,
-    "intersection_quality": intersection,
-    "placement_balance": balance,
+        "spatial_entropy": entropy,
+        "direction_diversity": direction_score,
+        "spatial_coverage": coverage,
+        "intersection_quality": intersection,
+        "placement_balance": balance,
     }
     score = sum(WEIGHTS[k] * v for k, v in components.items())
     reverse = sum(
