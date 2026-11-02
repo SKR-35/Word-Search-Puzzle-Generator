@@ -1,3 +1,7 @@
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=blue)
+![Database](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)
+![PDF](https://img.shields.io/badge/PDF-ReportLab-CC0000)
+
 # Word Search Puzzle Generator
 
 **Generate reproducible, quality-scored word search puzzles from themed word lists.**
