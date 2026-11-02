@@ -2,9 +2,10 @@
 
 import argparse
 
-from .database import connect, save_many
+from .database import connect, load_puzzle, save_many
 from .generator import generate_quality
 from .parser import parse_input
+from .pdf_export import export_pdfs
 
 
 def main() -> None:
@@ -17,6 +18,10 @@ def main() -> None:
     parser.add_argument(
         "--db",
         help="SQLite file path; omit for preview-only mode",
+    )
+    parser.add_argument(
+        "--pdf-dir",
+        help="Export puzzle and solution PDFs from saved records",
     )
     args = parser.parse_args()
     topics = parse_input(args.input, grid_size=args.size)
@@ -56,9 +61,21 @@ def main() -> None:
                     min_quality=args.min_quality,
                 )
 
+                pdf_items = (
+                    [
+                        (puzzle_id, *load_puzzle(conn, puzzle_id)[:2])
+                        for puzzle_id, _ in saved
+                    ]
+                    if args.pdf_dir
+                    else []
+                )
+
             for (topic, _, _), (puzzle_id, inserted) in zip(generated, saved):
                 status = "saved" if inserted else "already exists"
                 print(f"{topic.name}: puzzle #{puzzle_id} ({status})")
+            if args.pdf_dir:
+                paths = export_pdfs(pdf_items, args.pdf_dir)
+                print("PDF exports:", *paths, sep="\n  ")
         else:
             print("[PREVIEW ONLY: use --db to save; PDF is not implemented yet]")
 
