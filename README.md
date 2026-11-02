@@ -36,3 +36,15 @@ uv run ruff format --check .
 ```
 
 `--db` enables saving; omitting it keeps preview-only behavior. Each topic is generated and validated before a single atomic database save. The database stores the original input word order, the grid, solution coordinates, instructions, scores and metric version. Repeating the same generation returns existing IDs instead of adding duplicates. PDF export is planned for Phase 4.
+
+## Phase 4 — Print-ready PDFs
+
+Install the PDF dependency: `uv add reportlab`.
+
+Generate, persist and export two PDFs from the **saved** puzzle records:
+
+```powershell
+uv run word-search examples/input.txt --size 20 --seed 42 --min-quality 80 --candidates 100 --db data/puzzles.db --pdf-dir output
+```
+
+Outputs: `output/word-search-puzzles.pdf` (one US Letter page per puzzle) and `output/word-search-solutions.pdf` (four marked solutions per page). PDF export works with 15×15, 20×20, and 25×25 grids. Existing puzzle records are reused on reruns. PDF layout should be checked with a printed proof before publishing.
