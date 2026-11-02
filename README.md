@@ -1,6 +1,8 @@
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=blue)
 ![Database](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)
 ![PDF](https://img.shields.io/badge/PDF-ReportLab-CC0000)
+[![CI](https://img.shields.io/github/actions/workflow/status/SKR-35/Word-Search-Puzzle-Generator/ci.yml?branch=master&label=CI&logo=githubactions&logoColor=white)](https://github.com/SKR-35/Word-Search-Puzzle-Generator/actions/workflows/ci.yml)
+  
 
 # Word Search Puzzle Generator
 
