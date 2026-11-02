@@ -1,7 +1,8 @@
 """Parse topic blocks and validate puzzle vocabulary."""
+
+import re
 from dataclasses import dataclass
 from pathlib import Path
-import re
 
 
 @dataclass(frozen=True)
@@ -26,7 +27,9 @@ def parse_input(path: str | Path, *, grid_size: int = 20) -> list[Topic]:
         if current_name is None:
             return
         if len(current_words) != 15:
-            raise ValueError(f"Topic '{current_name}' requires exactly 15 words; got {len(current_words)}")
+            raise ValueError(
+                f"Topic '{current_name}' requires exactly 15 words; got {len(current_words)}"
+            )
         normalized = [normalize(w) for w in current_words]
         if len(set(normalized)) != 15:
             raise ValueError(f"Duplicate words in topic '{current_name}'")
