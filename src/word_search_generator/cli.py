@@ -2,6 +2,7 @@
 
 import argparse
 
+from .database import connect, save_many
 from .generator import generate_quality
 from .parser import parse_input
 
@@ -13,8 +14,13 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--min-quality", type=float, default=80)
     parser.add_argument("--candidates", type=int, default=100)
+    parser.add_argument(
+        "--db",
+        help="SQLite file path; omit for preview-only mode",
+    )
     args = parser.parse_args()
     topics = parse_input(args.input, grid_size=args.size)
+    generated = []
     for index, topic in enumerate(topics):
         puzzle, report = generate_quality(
             topic,
@@ -23,6 +29,8 @@ def main() -> None:
             min_quality=args.min_quality,
             candidates=args.candidates,
         )
+        generated.append((topic, puzzle, report))
+
         print(f"\n{puzzle.topic} ({args.size}x{args.size})")
         print("\n".join(" ".join(row) for row in puzzle.grid))
         print("Words:", ", ".join(topic.words))
@@ -40,7 +48,19 @@ def main() -> None:
             f"balance={report.placement_balance}"
         )
 
-        print("[PREVIEW ONLY: SQLite and PDF are not implemented yet]")
+        if args.db:
+            with connect(args.db) as conn:
+                saved = save_many(
+                    conn,
+                    generated,
+                    min_quality=args.min_quality,
+                )
+
+            for (topic, _, _), (puzzle_id, inserted) in zip(generated, saved):
+                status = "saved" if inserted else "already exists"
+                print(f"{topic.name}: puzzle #{puzzle_id} ({status})")
+        else:
+            print("[PREVIEW ONLY: use --db to save; PDF is not implemented yet]")
 
 
 if __name__ == "__main__":
