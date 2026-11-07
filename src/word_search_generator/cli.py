@@ -33,15 +33,24 @@ def main() -> None:
     topics = parse_input(
         args.input, grid_size=args.size, words_per_topic=args.words_per_topic
     )
+
     generated = []
+    failed = []
+
     for index, topic in enumerate(topics):
-        puzzle, report = generate_quality(
-            topic,
-            size=args.size,
-            seed=args.seed + index * 100000,
-            min_quality=args.min_quality,
-            candidates=args.candidates,
-        )
+        try:
+            puzzle, report = generate_quality(
+                topic,
+                size=args.size,
+                seed=args.seed + index * 100000,
+                min_quality=args.min_quality,
+                candidates=args.candidates,
+            )
+        except RuntimeError as exc:
+            failed.append((topic.name, str(exc)))
+            print(f"\n[SKIPPED] {topic.name}: {exc}")
+            continue
+
         generated.append((topic, puzzle, report))
 
         print(f"\n{puzzle.topic} ({args.size}x{args.size})")
@@ -86,6 +95,18 @@ def main() -> None:
                 print("PDF exports:", *paths, sep="\n  ")
         else:
             print("[PREVIEW ONLY: use --db to save; PDF is not implemented yet]")
+
+        print("\n" + "=" * 50)
+        print("BATCH GENERATION SUMMARY")
+        print("=" * 50)
+        print(f"Total topics : {len(topics)}")
+        print(f"Successful   : {len(generated)}")
+        print(f"Failed       : {len(failed)}")
+
+        if failed:
+            print("\nFailed topics:")
+            for name, reason in failed:
+                print(f"  - {name}: {reason}")
 
 
 if __name__ == "__main__":
