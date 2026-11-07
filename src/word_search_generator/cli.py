@@ -12,6 +12,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate word search previews")
     parser.add_argument("input", help="Text file containing one or more topic blocks")
     parser.add_argument("--size", type=int, default=20)
+    parser.add_argument(
+        "--words-per-topic",
+        type=int,
+        default=15,
+        help="Required number of words per topic (default: 15)",
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--min-quality", type=float, default=80)
     parser.add_argument("--candidates", type=int, default=100)
@@ -24,7 +30,9 @@ def main() -> None:
         help="Export puzzle and solution PDFs from saved records",
     )
     args = parser.parse_args()
-    topics = parse_input(args.input, grid_size=args.size)
+    topics = parse_input(
+        args.input, grid_size=args.size, words_per_topic=args.words_per_topic
+    )
     generated = []
     for index, topic in enumerate(topics):
         puzzle, report = generate_quality(

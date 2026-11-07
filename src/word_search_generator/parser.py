@@ -15,7 +15,11 @@ def normalize(word: str) -> str:
     return re.sub(r"[ -]", "", word.upper())
 
 
-def parse_input(path: str | Path, *, grid_size: int = 20) -> list[Topic]:
+def parse_input(
+    path: str | Path, *, grid_size: int = 20, words_per_topic: int = 15
+) -> list[Topic]:
+    if words_per_topic < 1:
+        raise ValueError("Words per topic must be at least 1")
     if grid_size < 5:
         raise ValueError("Grid size must be at least 5")
     lines = Path(path).read_text(encoding="utf-8-sig").splitlines()
@@ -26,12 +30,13 @@ def parse_input(path: str | Path, *, grid_size: int = 20) -> list[Topic]:
     def finish() -> None:
         if current_name is None:
             return
-        if len(current_words) != 15:
+        if len(current_words) != words_per_topic:
             raise ValueError(
-                f"Topic '{current_name}' requires exactly 15 words; got {len(current_words)}"
+                f"Topic '{current_name}' requires exactly {words_per_topic} words; "
+                f"got {len(current_words)}"
             )
         normalized = [normalize(w) for w in current_words]
-        if len(set(normalized)) != 15:
+        if len(set(normalized)) != len(normalized):
             raise ValueError(f"Duplicate words in topic '{current_name}'")
         topics.append(Topic(current_name, tuple(current_words)))
 

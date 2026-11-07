@@ -48,11 +48,13 @@ def generate(
         raise ValueError("Invalid size or attempts")
     words = [normalize(w) for w in topic.words]
     if (
-        len(words) != 15
-        or len(set(words)) != 15
+        len(words) not in (15, 20)
+        or len(set(words)) != len(words)
         or any(not w.isascii() or not w.isalpha() or len(w) > size for w in words)
     ):
-        raise ValueError("Topic must contain 15 distinct A-Z words fitting the grid")
+        raise ValueError(
+            "Topic must contain 15 or 20 distinct A-Z words fitting the grid"
+        )
     rng = random.Random(seed)
     for _ in range(attempts):
         board = [[None for _ in range(size)] for _ in range(size)]
