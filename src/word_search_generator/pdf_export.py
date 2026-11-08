@@ -106,21 +106,65 @@ def export_pdfs(
         )
         c.drawCentredString(PAGE_W / 2, 656, "Words may intersect with one another.")
         grid_width = 468
-        _grid(c, puzzle, x=(PAGE_W - grid_width) / 2, top=632, width=grid_width)
-        # Word list in three columns, five rows; larger terms wrap by reducing font.
+        _grid(c, puzzle, x=(PAGE_W - grid_width) / 2, top=632, width=grid_width)         
+
+        # Word list: fit columns to the printable width and center the block.
+        labels = [word.upper() for word in topic.words]
+        available_width = 468
+        column_gap = 14
+        font_name = "Helvetica"
+
+        layout = None
+
+        # Prefer four columns for 20 words, three for 15 words.
+        preferred_columns = 4 if len(labels) > 15 else 3
+
+        for columns in range(preferred_columns, 1, -1):
+            rows = (len(labels) + columns - 1) // columns
+
+            # Keep the word list above the footer.
+            if 128 - (rows - 1) * 13 < 52:
+                continue
+
+            for font_size in (10, 9.5, 9, 8.5, 8, 7.5, 7):
+                groups = [
+                    labels[col * rows : (col + 1) * rows]
+                    for col in range(columns)
+                ]
+                widths = [
+                    max(
+                        (c.stringWidth(word, font_name, font_size)
+                         for word in group),
+                        default=0,
+                    )
+                    for group in groups
+                ]
+                total_width = sum(widths) + column_gap * (columns - 1)
+
+                if total_width <= available_width:
+                    layout = (groups, widths, font_size, total_width)
+                    break
+
+            if layout is not None:
+                break
+
+        if layout is None:
+            raise ValueError(
+                f"Word list cannot fit on the page: {topic.name}"
+            )
+
+        groups, widths, font_size, total_width = layout
         c.setStrokeColor(LIGHT)
         c.line(72, 146, 540, 146)
-        for idx, word in enumerate(topic.words):
-            col, row = idx // 5, idx % 5
-            label = word.upper()
-            font_size = 10
-            while font_size > 7 and c.stringWidth(label, "Helvetica", font_size) > 142:
-                font_size -= 0.5
-            if c.stringWidth(label, "Helvetica", font_size) > 142:
-                raise ValueError(f"Word too wide for printed list: {word}")
-            c.setFont("Helvetica", font_size)
-            c.setFillColor(TEXT)
-            c.drawString(78 + col * 156, 128 - row * 17, label)
+        c.setFont(font_name, font_size)
+        c.setFillColor(TEXT)
+
+        x = (PAGE_W - total_width) / 2
+        for group, column_width in zip(groups, widths):
+            for row, label in enumerate(group):
+                c.drawString(x, 128 - row * 13, label)
+            x += column_width + column_gap
+
         c.setFont("Helvetica", 8)
         c.setFillColor(PRIMARY)
         c.drawCentredString(PAGE_W / 2, 35, f"PUZZLES   |   {number}")
