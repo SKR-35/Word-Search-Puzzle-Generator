@@ -106,7 +106,7 @@ def export_pdfs(
         )
         c.drawCentredString(PAGE_W / 2, 656, "Words may intersect with one another.")
         grid_width = 468
-        _grid(c, puzzle, x=(PAGE_W - grid_width) / 2, top=632, width=grid_width)         
+        _grid(c, puzzle, x=(PAGE_W - grid_width) / 2, top=632, width=grid_width)
 
         # Word list: fit columns to the printable width and center the block.
         labels = [word.upper() for word in topic.words]
@@ -128,13 +128,11 @@ def export_pdfs(
 
             for font_size in (10, 9.5, 9, 8.5, 8, 7.5, 7):
                 groups = [
-                    labels[col * rows : (col + 1) * rows]
-                    for col in range(columns)
+                    labels[col * rows : (col + 1) * rows] for col in range(columns)
                 ]
                 widths = [
                     max(
-                        (c.stringWidth(word, font_name, font_size)
-                         for word in group),
+                        (c.stringWidth(word, font_name, font_size) for word in group),
                         default=0,
                     )
                     for group in groups
@@ -149,9 +147,7 @@ def export_pdfs(
                 break
 
         if layout is None:
-            raise ValueError(
-                f"Word list cannot fit on the page: {topic.name}"
-            )
+            raise ValueError(f"Word list cannot fit on the page: {topic.name}")
 
         groups, widths, font_size, total_width = layout
         c.setStrokeColor(LIGHT)
