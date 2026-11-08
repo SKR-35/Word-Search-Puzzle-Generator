@@ -14,7 +14,8 @@ A Python command-line tool for creating word search grids, evaluating placement 
 
 - **Eight search directions:** horizontal, vertical and diagonal, forwards or backwards.
 - **Configurable square grids:** 15 × 15, 20 × 20 (default) or 25 × 25.
-- **Multiple topics per input:** one puzzle per topic, with exactly 15 words each.
+- **Multiple topics per input:** one puzzle per topic, with a configurable word count (15 by default; 20 also supported).
+- **Fault-tolerant batch generation:** skip topics that fail generation or quality checks, continue processing remaining topics and report failures in a final batch summary.
 - **Deterministic generation:** a seed makes candidate generation reproducible.
 - **Quality-gated selection:** evaluate multiple candidates and reject results below a configurable threshold.
 - **Placement diagnostics:** spatial entropy, direction diversity, spatial coverage, intersection quality and placement balance.
@@ -39,6 +40,13 @@ To persist puzzles and export PDFs:
 uv run word-search examples/input.txt --size 20 --seed 42 --min-quality 80 --candidates 100 --db data/puzzles.db --pdf-dir output
 ```
 
+### Generating 20-word puzzles
+
+For denser word search puzzles, increase the number of words per topic:
+
+```powershell
+uv run word-search examples/input.txt --size 20 --words-per-topic 20 --seed 42 --min-quality 80 --candidates 300 --db data/puzzles.db --pdf-dir output```
+
 Generated files:
 
 ```text
@@ -51,7 +59,7 @@ The PDF export reads the saved puzzle records, so the exported solutions corresp
 
 ## Input format
 
-Create a UTF-8 text file with a `topic:` heading followed by **exactly 15 words or phrases**. Repeat the block to generate additional puzzles.
+Create a UTF-8 text file with a `topic:` heading followed by exactly 15 words or phrases by default. Use `--words-per-topic 20` for 20-word puzzles. All topics in the same input file must contain the configured number of words. Repeat the block to generate additional puzzles.
 
 ```text
 topic: Ancient Greek Philosophy
@@ -97,6 +105,7 @@ Blank lines and `#` comments are supported. The generator uses the English alpha
 | --- | --- | --- |
 | `input` | Path to the themed word-list file | Required |
 | `--size` | Square grid dimension | `20` |
+| `--words-per-topic` | Required number of words per topic (15 or 20 supported) | `15` |
 | `--seed` | Seed for reproducible generation | `42` |
 | `--min-quality` | Minimum accepted placement-quality score (0–100) | `80` |
 | `--candidates` | Number of candidate boards to evaluate | `100` |
@@ -109,7 +118,11 @@ Example using a smaller grid:
 uv run word-search examples/input.txt --size 15 --seed 123 --candidates 200
 ```
 
-If no candidate satisfies the quality threshold, generation fails rather than silently accepting a lower-quality puzzle. Some word lists may be infeasible for a given grid size.
+If a topic cannot produce a valid puzzle meeting the quality threshold, it is skipped rather than silently accepting a lower-quality result. Batch processing continues with the remaining topics.
+
+At the end of execution, a batch summary reports the total number of topics, successful generations and failed generations, including failure reasons.
+
+Some word lists may be infeasible for a given grid size or quality threshold. Increasing `--candidates`, adjusting the word list or selecting a larger grid may improve generation success.
 
 ## How quality evaluation works
 
