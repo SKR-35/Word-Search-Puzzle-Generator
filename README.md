@@ -45,7 +45,8 @@ uv run word-search examples/input.txt --size 20 --seed 42 --min-quality 80 --can
 For denser word search puzzles, increase the number of words per topic:
 
 ```powershell
-uv run word-search examples/input.txt --size 20 --words-per-topic 20 --seed 42 --min-quality 80 --candidates 300 --db data/puzzles.db --pdf-dir output```
+uv run word-search examples/input.txt --size 20 --words-per-topic 20 --seed 42 --min-quality 80 --candidates 300 --db data/puzzles.db --pdf-dir output
+```
 
 Generated files:
 
